@@ -41,12 +41,12 @@ namespace parser {
         - renderStructures(pack string, structures <font color=blue>map</font>[string]*Struct, str *LineStringBuilder) 
         - renderAliases(str *LineStringBuilder) 
         - renderStructure(structure *Struct, pack string, name string, str *LineStringBuilder, composition *LineStringBuilder, extends *LineStringBuilder, aggregations *LineStringBuilder) 
-        - renderCompositions(structure *Struct, name string, composition *LineStringBuilder) 
+        - renderExtends(structure *Struct, name string, composition *LineStringBuilder) 
         - renderAggregations(structure *Struct, name string, aggregations *LineStringBuilder) 
         - updatePrivateAggregations(structure *Struct, aggregationsMap <font color=blue>map</font>[string]<font color=blue>struct</font>{}) 
         - renderAggregationMap(aggregationMap <font color=blue>map</font>[string]<font color=blue>struct</font>{}, structure *Struct, aggregations *LineStringBuilder, name string) 
         - getPackageName(t string, st *Struct) string
-        - renderExtends(structure *Struct, name string, extends *LineStringBuilder) 
+        - renderImplements(structure *Struct, name string, extends *LineStringBuilder) 
         - renderStructMethods(structure *Struct, privateMethods *LineStringBuilder, publicMethods *LineStringBuilder) 
         - renderStructFields(structure *Struct, privateFields *LineStringBuilder, publicFields *LineStringBuilder) 
         - getOrCreateStruct(name string) *Struct
@@ -95,8 +95,8 @@ namespace parser {
         + Functions []*Function
         + Fields []*Field
         + Type string
-        + Composition <font color=blue>map</font>[string]<font color=blue>struct</font>{}
         + Extends <font color=blue>map</font>[string]<font color=blue>struct</font>{}
+        + Implements <font color=blue>map</font>[string]<font color=blue>struct</font>{}
         + Aggregations <font color=blue>map</font>[string]<font color=blue>struct</font>{}
         + PrivateAggregations <font color=blue>map</font>[string]<font color=blue>struct</font>{}
 
@@ -115,15 +115,16 @@ namespace parser {
     class parser.RenderingOption << (T, #FF7700) >>  {
     }
 }
-"strings.Builder" *-- "extends""parser.LineStringBuilder"
+"strings.Builder" <|-- "泛化""parser.LineStringBuilder"
 
 
-"parser.ClassDiagramOptions""uses" o-- "afero.Fs"
-"parser.ClassDiagramOptions""uses" o-- "parser.RenderingOption"
-"parser.Function""uses" o-- "parser.Field"
-"parser.Struct""uses" o-- "parser.Field"
-"parser.Struct""uses" o-- "parser.Function"
+"parser.ClassDiagramOptions""聚合" o-- "afero.Fs"
+"parser.ClassDiagramOptions""聚合" o-- "parser.RenderingOption"
+"parser.Function""聚合" o-- "parser.Field"
+"parser.Struct""聚合" o-- "parser.Field"
+"parser.Struct""聚合" o-- "parser.Function"
 
-"__builtin__.int" #.. "alias of""parser.RenderingOption"
-"parser.[]Alias" #.. "alias of""parser.AliasSlice"
+"__builtin__.int" #.. "别名""parser.RenderingOption"
+"parser.[]Alias" #.. "别名""parser.AliasSlice"
+hide @unlinked
 @enduml

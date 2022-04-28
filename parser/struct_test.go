@@ -249,32 +249,32 @@ func TestAddToComposition(t *testing.T) {
 		Type:        "class",
 		PackageName: "test",
 		Fields:      make([]*Field, 0),
-		Composition: make(map[string]struct{}),
 		Extends:     make(map[string]struct{}),
+		Implements:  make(map[string]struct{}),
 	}
 	st.AddToComposition("Foo")
 
-	if !arrayContains(st.Composition, "Foo") {
-		t.Errorf("TestAddToComposition: Expected CompositionArray to have %s, but it contains %v", "Foo", st.Composition)
+	if !arrayContains(st.Extends, "Foo") {
+		t.Errorf("TestAddToComposition: Expected CompositionArray to have %s, but it contains %v", "Foo", st.Extends)
 	}
 
 	st.AddToComposition("")
 
-	if arrayContains(st.Composition, "") {
-		t.Errorf(`TestAddToComposition: Expected CompositionArray to not have "", but it contains %v`, st.Composition)
+	if arrayContains(st.Extends, "") {
+		t.Errorf(`TestAddToComposition: Expected CompositionArray to not have "", but it contains %v`, st.Extends)
 	}
 	testArray := map[string]struct{}{
 		"Foo": {},
 	}
-	if !reflect.DeepEqual(st.Composition, testArray) {
+	if !reflect.DeepEqual(st.Extends, testArray) {
 
-		t.Errorf("TestAddToComposition: Expected CompositionArray to be %v, but it contains %v", testArray, st.Composition)
+		t.Errorf("TestAddToComposition: Expected CompositionArray to be %v, but it contains %v", testArray, st.Extends)
 	}
 
 	st.AddToComposition("*Foo2")
 
-	if !arrayContains(st.Composition, "Foo2") {
-		t.Errorf("TestAddToComposition: Expected CompositionArray to have %s, but it contains %v", "Foo2", st.Composition)
+	if !arrayContains(st.Extends, "Foo2") {
+		t.Errorf("TestAddToComposition: Expected CompositionArray to have %s, but it contains %v", "Foo2", st.Extends)
 	}
 }
 func TestAddToExtension(t *testing.T) {
@@ -297,31 +297,31 @@ func TestAddToExtension(t *testing.T) {
 		Type:        "class",
 		PackageName: "test",
 		Fields:      make([]*Field, 0),
-		Composition: make(map[string]struct{}),
 		Extends:     make(map[string]struct{}),
+		Implements:  make(map[string]struct{}),
 	}
 	st.AddToExtends("Foo")
 
-	if !arrayContains(st.Extends, "Foo") {
-		t.Errorf("TestAddToComposition: Expected Extends Array to have %s, but it contains %v", "Foo", st.Composition)
+	if !arrayContains(st.Implements, "Foo") {
+		t.Errorf("TestAddToComposition: Expected Extends Array to have %s, but it contains %v", "Foo", st.Extends)
 	}
 
 	st.AddToExtends("")
 
-	if arrayContains(st.Extends, "") {
-		t.Errorf(`TestAddToComposition: Expected Extends Array to not have "", but it contains %v`, st.Composition)
+	if arrayContains(st.Implements, "") {
+		t.Errorf(`TestAddToComposition: Expected Extends Array to not have "", but it contains %v`, st.Extends)
 	}
 	testArray := map[string]struct{}{
 		"Foo": {},
 	}
-	if !reflect.DeepEqual(st.Extends, testArray) {
-		t.Errorf("TestAddToComposition: Expected Extends Array to be %v, but it contains %v", testArray, st.Composition)
+	if !reflect.DeepEqual(st.Implements, testArray) {
+		t.Errorf("TestAddToComposition: Expected Extends Array to be %v, but it contains %v", testArray, st.Extends)
 	}
 
 	st.AddToExtends("*Foo2")
 
-	if !arrayContains(st.Extends, "Foo2") {
-		t.Errorf("TestAddToComposition: Expected Extends Array to have %s, but it contains %v", "Foo2", st.Composition)
+	if !arrayContains(st.Implements, "Foo2") {
+		t.Errorf("TestAddToComposition: Expected Extends Array to have %s, but it contains %v", "Foo2", st.Extends)
 	}
 }
 
@@ -350,8 +350,8 @@ func TestAddField(t *testing.T) {
 		},
 		Type:         "class",
 		Fields:       make([]*Field, 0),
-		Composition:  make(map[string]struct{}),
 		Extends:      make(map[string]struct{}),
+		Implements:   make(map[string]struct{}),
 		Aggregations: make(map[string]struct{}),
 	}
 	st.AddField(&ast.Field{
@@ -383,8 +383,8 @@ func TestAddField(t *testing.T) {
 		},
 	}, make(map[string]string))
 
-	if !arrayContains(st.Composition, "FooComposed") {
-		t.Errorf("TestAddField: Expecting FooComposed to be part of the compositions ,but the array had %v", st.Composition)
+	if !arrayContains(st.Extends, "FooComposed") {
+		t.Errorf("TestAddField: Expecting FooComposed to be part of the compositions ,but the array had %v", st.Extends)
 	}
 	st.AddField(&ast.Field{
 		Names: []*ast.Ident{

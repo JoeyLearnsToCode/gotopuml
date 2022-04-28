@@ -1,6 +1,6 @@
-module github.com/jfeliu007/goplantuml
+module github.com/JoeyLearnsToCode/gotopuml
 
-go 1.17
+go 1.16
 
 require (
 	github.com/spf13/afero v1.8.2

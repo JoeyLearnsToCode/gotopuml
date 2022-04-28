@@ -94,8 +94,8 @@ func TestGetOrCreateStruct(t *testing.T) {
 					Functions:           make([]*Function, 0),
 					Fields:              make([]*Field, 0),
 					Type:                "",
-					Composition:         make(map[string]struct{}, 0),
 					Extends:             make(map[string]struct{}, 0),
+					Implements:          make(map[string]struct{}, 0),
 					Aggregations:        make(map[string]struct{}, 0),
 					PrivateAggregations: make(map[string]struct{}, 0),
 				}) {
@@ -253,10 +253,10 @@ func getTestStruct() *Struct {
 	return &Struct{
 		Type:        "class",
 		PackageName: "main",
-		Composition: map[string]struct{}{
+		Extends: map[string]struct{}{
 			"foopack.AnotherClass": {},
 		},
-		Extends: map[string]struct{}{
+		Implements: map[string]struct{}{
 			"NewClass": {},
 		},
 		Aggregations: map[string]struct{}{},
@@ -303,15 +303,15 @@ func TestRenderCompositions(t *testing.T) {
 	parser := getEmptyParser("main")
 	st := &Struct{
 		PackageName: "main",
-		Composition: map[string]struct{}{
+		Extends: map[string]struct{}{
 			"foopack.AnotherClass": {},
 		},
-		Extends: map[string]struct{}{
+		Implements: map[string]struct{}{
 			"foopack.YetAnotherClass": {},
 		},
 	}
 	extendsBuilder := &LineStringBuilder{}
-	parser.renderCompositions(st, "TestClass", extendsBuilder)
+	parser.renderExtends(st, "TestClass", extendsBuilder)
 	expectedResult := "\"foopack.AnotherClass\" *-- \"main.TestClass\"\n"
 	if extendsBuilder.String() != expectedResult {
 		t.Errorf("TestRenderCompositions: Expected %s got %s", expectedResult, extendsBuilder.String())
@@ -319,12 +319,12 @@ func TestRenderCompositions(t *testing.T) {
 
 	st = &Struct{
 		PackageName: "main",
-		Composition: map[string]struct{}{
+		Extends: map[string]struct{}{
 			"AnotherClass": {},
 		},
 	}
 	extendsBuilder = &LineStringBuilder{}
-	parser.renderCompositions(st, "TestClass", extendsBuilder)
+	parser.renderExtends(st, "TestClass", extendsBuilder)
 	expectedResult = "\"main.AnotherClass\" *-- \"main.TestClass\"\n"
 	if extendsBuilder.String() != expectedResult {
 		t.Errorf("TestRenderCompositions: Expected %s got %s", expectedResult, extendsBuilder.String())
@@ -332,12 +332,12 @@ func TestRenderCompositions(t *testing.T) {
 
 	st = &Struct{
 		PackageName: "main",
-		Composition: map[string]struct{}{
+		Extends: map[string]struct{}{
 			"int": {},
 		},
 	}
 	extendsBuilder = &LineStringBuilder{}
-	parser.renderCompositions(st, "TestClass", extendsBuilder)
+	parser.renderExtends(st, "TestClass", extendsBuilder)
 	expectedResult = "\"" + builtinPackageName + ".int\" *-- \"main.TestClass\"\n"
 	if extendsBuilder.String() != expectedResult {
 		t.Errorf("TestRenderCompositions: Expected %s got %s", expectedResult, extendsBuilder.String())
@@ -347,12 +347,12 @@ func TestRenderExtends(t *testing.T) {
 	parser := getEmptyParser("main")
 	st := &Struct{
 		PackageName: "main",
-		Extends: map[string]struct{}{
+		Implements: map[string]struct{}{
 			"foopack.AnotherClass": {},
 		},
 	}
 	extendsBuilder := &LineStringBuilder{}
-	parser.renderExtends(st, "TestClass", extendsBuilder)
+	parser.renderImplements(st, "TestClass", extendsBuilder)
 	expectedResult := "\"foopack.AnotherClass\" <|-- \"main.TestClass\"\n"
 	if extendsBuilder.String() != expectedResult {
 		t.Errorf("TestRenderExtends: Expected %s got %s", expectedResult, extendsBuilder.String())
@@ -360,12 +360,12 @@ func TestRenderExtends(t *testing.T) {
 
 	st = &Struct{
 		PackageName: "main",
-		Extends: map[string]struct{}{
+		Implements: map[string]struct{}{
 			"AnotherClass": {},
 		},
 	}
 	extendsBuilder = &LineStringBuilder{}
-	parser.renderExtends(st, "TestClass", extendsBuilder)
+	parser.renderImplements(st, "TestClass", extendsBuilder)
 	expectedResult = "\"main.AnotherClass\" <|-- \"main.TestClass\"\n"
 	if extendsBuilder.String() != expectedResult {
 		t.Errorf("TestRenderExtends: Expected %s got %s", expectedResult, extendsBuilder.String())
@@ -716,7 +716,7 @@ func TestRenderCompositionFromInterfaces(t *testing.T) {
 		return
 	}
 	st := parser.getStruct("subfolder.test2")
-	if _, ok := st.Composition["subfolder.TestInterfaceAsField"]; !ok {
+	if _, ok := st.Extends["subfolder.TestInterfaceAsField"]; !ok {
 		t.Errorf("TestRenderCompositionFromInterfaces: expected st to have a composition dependency to subfolder.TestInterfaceAsField")
 	}
 }

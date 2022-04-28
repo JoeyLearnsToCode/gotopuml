@@ -8,7 +8,7 @@ containing the information it needs to Render the class diagram.
 
 call the Render() function and this will return a string with the class diagram.
 
-See github.com/jfeliu007/goplantuml/cmd/goplantuml/main.go for a command that uses this functions and outputs the text to
+See github.com/JoeyLearnsToCode/gotopuml/cmd/gotopuml/main.go for a command that uses this functions and outputs the text to
 the console.
 
 */
@@ -37,10 +37,10 @@ type LineStringBuilder struct {
 
 const tab = "    "
 const builtinPackageName = "__builtin__"
-const implements = `"implements"`
-const extends = `"extends"`
-const aggregates = `"uses"`
-const aliasOf = `"alias of"`
+const implements = `"实现"`
+const extends = `"泛化"`
+const aggregates = `"聚合"`
+const aliasOf = `"别名"`
 
 // WriteLineWithDepth will write the given text with added tabs at the beginning into the string builder.
 func (lsb *LineStringBuilder) WriteLineWithDepth(depth int, str string) {
@@ -432,6 +432,7 @@ func (p *ClassParser) Render() string {
 	if !p.renderingOptions.Methods {
 		str.WriteLineWithDepth(0, "hide methods")
 	}
+	str.WriteLineWithDepth(0, "hide @unlinked")
 	str.WriteLineWithDepth(0, "@enduml")
 	return str.String()
 }
@@ -523,8 +524,8 @@ func (p *ClassParser) renderStructure(structure *Struct, pack string, name strin
 	str.WriteLineWithDepth(1, fmt.Sprintf(`%s %s %s {`, renderStructureType, name, sType))
 	p.renderStructFields(structure, privateFields, publicFields)
 	p.renderStructMethods(structure, privateMethods, publicMethods)
-	p.renderCompositions(structure, name, composition)
-	p.renderExtends(structure, name, extends)
+	p.renderExtends(structure, name, composition)
+	p.renderImplements(structure, name, extends)
 	p.renderAggregations(structure, name, aggregations)
 	if privateFields.Len() > 0 {
 		str.WriteLineWithDepth(0, privateFields.String())
@@ -541,10 +542,10 @@ func (p *ClassParser) renderStructure(structure *Struct, pack string, name strin
 	str.WriteLineWithDepth(1, fmt.Sprintf(`}`))
 }
 
-func (p *ClassParser) renderCompositions(structure *Struct, name string, composition *LineStringBuilder) {
+func (p *ClassParser) renderExtends(structure *Struct, name string, composition *LineStringBuilder) {
 	orderedCompositions := []string{}
 
-	for c := range structure.Composition {
+	for c := range structure.Extends {
 		if !strings.Contains(c, ".") {
 			c = fmt.Sprintf("%s.%s", p.getPackageName(c, structure), c)
 		}
@@ -552,7 +553,7 @@ func (p *ClassParser) renderCompositions(structure *Struct, name string, composi
 		if p.renderingOptions.ConnectionLabels {
 			composedString = extends
 		}
-		c = fmt.Sprintf(`"%s" *-- %s"%s.%s"`, c, composedString, structure.PackageName, name)
+		c = fmt.Sprintf(`"%s" <|-- %s"%s.%s"`, c, composedString, structure.PackageName, name)
 		orderedCompositions = append(orderedCompositions, c)
 	}
 	sort.Strings(orderedCompositions)
@@ -607,10 +608,10 @@ func (p *ClassParser) getPackageName(t string, st *Struct) string {
 	}
 	return packageName
 }
-func (p *ClassParser) renderExtends(structure *Struct, name string, extends *LineStringBuilder) {
+func (p *ClassParser) renderImplements(structure *Struct, name string, extends *LineStringBuilder) {
 
 	orderedExtends := []string{}
-	for c := range structure.Extends {
+	for c := range structure.Implements {
 		if !strings.Contains(c, ".") {
 			c = fmt.Sprintf("%s.%s", structure.PackageName, c)
 		}
@@ -618,7 +619,7 @@ func (p *ClassParser) renderExtends(structure *Struct, name string, extends *Lin
 		if p.renderingOptions.ConnectionLabels {
 			implementString = implements
 		}
-		c = fmt.Sprintf(`"%s" <|-- %s"%s.%s"`, c, implementString, structure.PackageName, name)
+		c = fmt.Sprintf(`"%s" <|.. %s"%s.%s"`, c, implementString, structure.PackageName, name)
 		orderedExtends = append(orderedExtends, c)
 	}
 	sort.Strings(orderedExtends)
@@ -685,8 +686,8 @@ func (p *ClassParser) getOrCreateStruct(name string) *Struct {
 			Functions:           make([]*Function, 0),
 			Fields:              make([]*Field, 0),
 			Type:                "",
-			Composition:         make(map[string]struct{}, 0),
 			Extends:             make(map[string]struct{}, 0),
+			Implements:          make(map[string]struct{}, 0),
 			Aggregations:        make(map[string]struct{}, 0),
 			PrivateAggregations: make(map[string]struct{}, 0),
 		}

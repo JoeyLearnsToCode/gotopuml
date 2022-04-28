@@ -4,16 +4,17 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	goplantuml "github.com/jfeliu007/goplantuml/parser"
 	"io"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+
+	gotopuml "github.com/JoeyLearnsToCode/gotopuml/parser"
 )
 
 // RenderingOptionSlice will implements the sort interface
-type RenderingOptionSlice []goplantuml.RenderingOption
+type RenderingOptionSlice []gotopuml.RenderingOption
 
 // Len is the number of elements in the collection.
 func (as RenderingOptionSlice) Len() int {
@@ -49,19 +50,19 @@ func main() {
 	aggregatePrivateMembers := flag.Bool("aggregate-private-members", false, "Show aggregations for private members. Ignored if -show-aggregations is not used.")
 	hidePrivateMembers := flag.Bool("hide-private-members", false, "Hide private fields and methods")
 	flag.Parse()
-	renderingOptions := map[goplantuml.RenderingOption]interface{}{
-		goplantuml.RenderConnectionLabels:  *showConnectionLabels,
-		goplantuml.RenderFields:            !*hideFields,
-		goplantuml.RenderMethods:           !*hideMethods,
-		goplantuml.RenderAggregations:      *showAggregations,
-		goplantuml.RenderTitle:             *title,
-		goplantuml.AggregatePrivateMembers: *aggregatePrivateMembers,
-		goplantuml.RenderPrivateMembers:    !*hidePrivateMembers,
+	renderingOptions := map[gotopuml.RenderingOption]interface{}{
+		gotopuml.RenderConnectionLabels:  *showConnectionLabels,
+		gotopuml.RenderFields:            !*hideFields,
+		gotopuml.RenderMethods:           !*hideMethods,
+		gotopuml.RenderAggregations:      *showAggregations,
+		gotopuml.RenderTitle:             *title,
+		gotopuml.AggregatePrivateMembers: *aggregatePrivateMembers,
+		gotopuml.RenderPrivateMembers:    !*hidePrivateMembers,
 	}
 	if *hideConnections {
-		renderingOptions[goplantuml.RenderAliases] = *showAliases
-		renderingOptions[goplantuml.RenderCompositions] = *showCompositions
-		renderingOptions[goplantuml.RenderImplementations] = *showImplementations
+		renderingOptions[gotopuml.RenderAliases] = *showAliases
+		renderingOptions[gotopuml.RenderCompositions] = *showCompositions
+		renderingOptions[gotopuml.RenderImplementations] = *showImplementations
 
 	}
 	noteList := []string{}
@@ -83,23 +84,23 @@ func main() {
 			noteList = append(noteList, trimmed)
 		}
 	}
-	renderingOptions[goplantuml.RenderNotes] = strings.Join(noteList, "\n")
+	renderingOptions[gotopuml.RenderNotes] = strings.Join(noteList, "\n")
 	dirs, err := getDirectories()
 
 	if err != nil {
-		fmt.Println("usage:\ngoplantuml <DIR>\nDIR Must be a valid directory")
+		fmt.Println("usage:\ngotopuml <DIR>\nDIR Must be a valid directory")
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	}
 	ignoredDirectories, err := getIgnoredDirectories(*ignore)
 	if err != nil {
 
-		fmt.Println("usage:\ngoplantuml [-ignore=<DIRLIST>]\nDIRLIST Must be a valid comma separated list of existing directories")
+		fmt.Println("usage:\ngotopuml [-ignore=<DIRLIST>]\nDIRLIST Must be a valid comma separated list of existing directories")
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	}
 
-	result, err := goplantuml.NewClassDiagram(dirs, ignoredDirectories, *recursive)
+	result, err := gotopuml.NewClassDiagram(dirs, ignoredDirectories, *recursive)
 	result.SetRenderingOptions(renderingOptions)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
@@ -159,7 +160,7 @@ func getIgnoredDirectories(list string) ([]string, error) {
 	return result, nil
 }
 
-func getLegend(ro map[goplantuml.RenderingOption]interface{}) (string, error) {
+func getLegend(ro map[gotopuml.RenderingOption]interface{}) (string, error) {
 	result := "<u><b>Legend</b></u>\n"
 	orderedOptions := RenderingOptionSlice{}
 	for o := range ro {
@@ -169,19 +170,19 @@ func getLegend(ro map[goplantuml.RenderingOption]interface{}) (string, error) {
 	for _, option := range orderedOptions {
 		val := ro[option]
 		switch option {
-		case goplantuml.RenderAggregations:
+		case gotopuml.RenderAggregations:
 			result = fmt.Sprintf("%sRender Aggregations: %t\n", result, val.(bool))
-		case goplantuml.RenderAliases:
+		case gotopuml.RenderAliases:
 			result = fmt.Sprintf("%sRender Connections: %t\n", result, val.(bool))
-		case goplantuml.RenderCompositions:
+		case gotopuml.RenderCompositions:
 			result = fmt.Sprintf("%sRender Compositions: %t\n", result, val.(bool))
-		case goplantuml.RenderFields:
+		case gotopuml.RenderFields:
 			result = fmt.Sprintf("%sRender Fields: %t\n", result, val.(bool))
-		case goplantuml.RenderImplementations:
+		case gotopuml.RenderImplementations:
 			result = fmt.Sprintf("%sRender Implementations: %t\n", result, val.(bool))
-		case goplantuml.RenderMethods:
+		case gotopuml.RenderMethods:
 			result = fmt.Sprintf("%sRender Methods: %t\n", result, val.(bool))
-		case goplantuml.AggregatePrivateMembers:
+		case gotopuml.AggregatePrivateMembers:
 			result = fmt.Sprintf("%sPritave Aggregations: %t\n", result, val.(bool))
 		}
 	}

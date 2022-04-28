@@ -47,7 +47,7 @@ func TestGetFieldType(t *testing.T) {
 		},
 		{
 			Name:           "Test *ast.SelectorExpr",
-			ExpectedResult: "goplantuml.TestClass",
+			ExpectedResult: "gotopuml.TestClass",
 			InputField: &ast.SelectorExpr{
 				X: &ast.Ident{
 					Name: "puml",
@@ -56,7 +56,7 @@ func TestGetFieldType(t *testing.T) {
 					Name: "TestClass",
 				},
 			},
-			ExpectedFundamentalTypes: []string{"goplantuml.TestClass"},
+			ExpectedFundamentalTypes: []string{"gotopuml.TestClass"},
 		},
 		{
 			Name:           "Test *ast.MapType",
@@ -258,7 +258,7 @@ func TestGetFieldType(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
 			inputAliasMap := map[string]string{
-				"puml": "goplantuml",
+				"puml": "gotopuml",
 			}
 			result, fundamentalTypes := getFieldType(tc.InputField, inputAliasMap)
 			if result != tc.ExpectedResult {

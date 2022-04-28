@@ -12,8 +12,8 @@ type Struct struct {
 	Functions           []*Function
 	Fields              []*Field
 	Type                string
-	Composition         map[string]struct{}
 	Extends             map[string]struct{}
+	Implements          map[string]struct{}
 	Aggregations        map[string]struct{}
 	PrivateAggregations map[string]struct{}
 }
@@ -48,7 +48,7 @@ func (st *Struct) AddToComposition(fType string) {
 	if fType[0] == "*"[0] {
 		fType = fType[1:]
 	}
-	st.Composition[fType] = struct{}{}
+	st.Extends[fType] = struct{}{}
 }
 
 //AddToExtends Adds an extends relationship to this struct. We want to make sure that *ExampleStruct
@@ -61,7 +61,7 @@ func (st *Struct) AddToExtends(fType string) {
 	if fType[0] == "*"[0] {
 		fType = fType[1:]
 	}
-	st.Extends[fType] = struct{}{}
+	st.Implements[fType] = struct{}{}
 }
 
 //AddToAggregation adds an aggregation type to the list of aggregations
