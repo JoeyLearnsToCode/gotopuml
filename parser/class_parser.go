@@ -553,7 +553,7 @@ func (p *ClassParser) renderCompositions(structure *Struct, name string, composi
 		if p.renderingOptions.ConnectionLabels {
 			composedString = composes
 		}
-		c = fmt.Sprintf(`"%s.%s" *-- %s"%s"`, structure.PackageName, name, composedString, c)
+		c = fmt.Sprintf(`"%s.%s" *-U- %s"%s"`, structure.PackageName, name, composedString, c)
 		orderedCompositions = append(orderedCompositions, c)
 	}
 	sort.Strings(orderedCompositions)
@@ -619,7 +619,7 @@ func (p *ClassParser) renderImplements(structure *Struct, name string, extends *
 		if p.renderingOptions.ConnectionLabels {
 			implementString = implements
 		}
-		c = fmt.Sprintf(`"%s" <|.. %s"%s.%s"`, c, implementString, structure.PackageName, name)
+		c = fmt.Sprintf(`"%s" <|.D. %s"%s.%s"`, c, implementString, structure.PackageName, name)
 		orderedExtends = append(orderedExtends, c)
 	}
 	sort.Strings(orderedExtends)
