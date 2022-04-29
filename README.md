@@ -1,6 +1,194 @@
-# gotopuml
+[![godoc reference](https://img.shields.io/badge/godoc-reference-blue.svg)](https://godoc.org/github.com/JoeyLearnsToCode/gotopuml/parser) [![Go Report Card](https://goreportcard.com/badge/github.com/JoeyLearnsToCode/gotopuml)](https://goreportcard.com/report/github.com/JoeyLearnsToCode/gotopuml) [![codecov](https://codecov.io/gh/JoeyLearnsToCode/gotopuml/branch/master/graph/badge.svg)](https://codecov.io/gh/JoeyLearnsToCode/gotopuml) [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![GitHub release](https://img.shields.io/github/release/JoeyLearnsToCode/gotopuml.svg)](https://github.com/JoeyLearnsToCode/gotopuml/releases/)
+[![Build Status](https://travis-ci.org/JoeyLearnsToCode/gotopuml.svg?branch=master)](https://travis-ci.org/JoeyLearnsToCode/gotopuml)
+[![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
+# gotopuml V2
 
-## install
+PlantUML Class Diagram Generator for golang projects. Generates class diagram text compatible with plantuml with the information of all structures and interfaces as well as the relationship among them.
 
+### Prerequisites
+golang 1.17 or above
+
+### Installing
+
+```
 go get github.com/JoeyLearnsToCode/gotopuml
 go install github.com/JoeyLearnsToCode/gotopuml/cmd/gotopuml@latest
+```
+
+This will install the command gotopuml in your GOPATH bin folder.
+
+### Usage
+
+```
+gotopuml [-recursive] path/to/gofiles path/to/gofiles2
+```
+```
+gotopuml [-recursive] path/to/gofiles path/to/gofiles2 > diagram_file_name.puml
+```
+```
+Usage of gotopuml:
+  -aggregate-private-members
+        Show aggregations for private members. Ignored if -show-aggregations is not used.
+  -hide-connections
+        hides all connections in the diagram
+  -hide-fields
+        hides fields
+  -hide-methods
+        hides methods
+  -ignore string
+        comma separated list of folders to ignore
+  -notes string
+        Comma separated list of notes to be added to the diagram
+  -output string
+        output file path. If omitted, then this will default to standard output
+  -recursive
+        walk all directories recursively
+  -show-aggregations
+        renders public aggregations even when -hide-connections is used (do not render by default)
+  -show-aliases
+        Shows aliases even when -hide-connections is used
+  -show-compositions
+        Shows compositions even when -hide-connections is used
+  -show-connection-labels
+        Shows labels in the connections to identify the connections types (e.g. extends, implements, aggregates, alias of
+  -show-implementations
+        Shows implementations even when -hide-connections is used
+  -show-options-as-note
+        Show a note in the diagram with the none evident options ran with this CLI
+  -title string
+        Title of the generated diagram
+  -hide-private-members
+        Hides all private members (fields and methods)
+```
+
+#### Example
+```
+gotopuml $GOPATH/src/github.com/JoeyLearnsToCode/gotopuml/parser
+```
+```
+// echoes
+
+@startuml
+namespace parser {
+    class Struct {
+        + Functions []*Function
+        + Fields []*Parameter
+        + Type string
+        + Composition []string
+        + Extends []string
+
+    }
+    class LineStringBuilder {
+        + WriteLineWithDepth(depth int, str string) 
+
+    }
+    class ClassParser {
+        - structure <font color=blue>map</font>[string]<font color=blue>map</font>[string]*Struct
+        - currentPackageName string
+        - allInterfaces <font color=blue>map</font>[string]<font color=blue>struct</font>{}
+        - allStructs <font color=blue>map</font>[string]<font color=blue>struct</font>{}
+
+        - structImplementsInterface(st *Struct, inter *Struct) 
+        - parsePackage(node ast.Node) 
+        - parseFileDeclarations(node ast.Decl) 
+        - addMethodToStruct(s *Struct, method *ast.Field) 
+        - getFunction(f *ast.FuncType, name string) 
+        - addFieldToStruct(s *Struct, field *ast.Field) 
+        - addToComposition(s *Struct, fType string) 
+        - addToExtends(s *Struct, fType string) 
+        - getOrCreateStruct(name string) 
+        - getStruct(structName string) 
+        - getFieldType(exp ast.Expr, includePackageName bool) 
+
+        + Render() 
+
+    }
+    class Parameter {
+        + Name string
+        + Type string
+
+    }
+    class Function {
+        + Name string
+        + Parameters []*Parameter
+        + ReturnValues []string
+
+    }
+}
+strings.Builder *-- parser.LineStringBuilder
+
+
+@enduml
+```
+```
+gotopuml $GOPATH/src/github.com/JoeyLearnsToCode/gotopuml/parser > ClassDiagram.puml
+// Generates a file ClassDiagram.plum with the previous specifications
+```
+
+There are two different relationships considered in gotopuml:
+- Interface implementation
+- Type Composition
+
+The following example contains interface implementations and composition. Notice how the signature of the functions
+```golang
+package testingsupport
+
+//MyInterface only has one method, notice the signature return value
+type MyInterface interface {
+	foo() bool
+}
+
+//MyStruct1 will implement the foo() bool function so it will have an "extends" association with MyInterface
+type MyStruct1 struct {
+}
+
+func (s1 *MyStruct1) foo() bool {
+	return true
+}
+
+//MyStruct2 will be directly composed of MyStruct1 so it will have a composition relationship with it
+type MyStruct2 struct {
+	MyStruct1
+}
+
+//MyStruct3 will have a foo() function but the return value is not a bool, so it will not have any relationship with MyInterface
+type MyStruct3 struct {
+    Foo MyStruct1
+}
+
+func (s3 *MyStruct3) foo() {
+
+}
+```
+This will be generated from the previous code
+```
+@startuml
+namespace testingsupport {
+    interface MyInterface  {
+        - foo() bool
+
+    }
+    class MyStruct1 << (S,Aquamarine) >> {
+        - foo() bool
+
+    }
+    class MyStruct2 << (S,Aquamarine) >> {
+    }
+    class MyStruct3 << (S,Aquamarine) >> {
+        - foo() 
+
+        + Foo MyStruct1
+
+    }
+}
+testingsupport.MyStruct1 *-- testingsupport.MyStruct2
+
+testingsupport.MyInterface <|-- testingsupport.MyStruct1
+
+testingsupport.MyStruct3 o-- testingsupport.MyStruct1
+
+@enduml
+```
+
+![alt text](https://raw.githubusercontent.com/JoeyLearnsToCode/gotopuml/master/example/example.png)

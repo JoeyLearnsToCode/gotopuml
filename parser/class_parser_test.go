@@ -311,7 +311,7 @@ func TestRenderCompositions(t *testing.T) {
 		},
 	}
 	extendsBuilder := &LineStringBuilder{}
-	parser.renderExtends(st, "TestClass", extendsBuilder)
+	parser.renderCompositions(st, "TestClass", extendsBuilder)
 	expectedResult := "\"foopack.AnotherClass\" *-- \"main.TestClass\"\n"
 	if extendsBuilder.String() != expectedResult {
 		t.Errorf("TestRenderCompositions: Expected %s got %s", expectedResult, extendsBuilder.String())
@@ -324,7 +324,7 @@ func TestRenderCompositions(t *testing.T) {
 		},
 	}
 	extendsBuilder = &LineStringBuilder{}
-	parser.renderExtends(st, "TestClass", extendsBuilder)
+	parser.renderCompositions(st, "TestClass", extendsBuilder)
 	expectedResult = "\"main.AnotherClass\" *-- \"main.TestClass\"\n"
 	if extendsBuilder.String() != expectedResult {
 		t.Errorf("TestRenderCompositions: Expected %s got %s", expectedResult, extendsBuilder.String())
@@ -337,7 +337,7 @@ func TestRenderCompositions(t *testing.T) {
 		},
 	}
 	extendsBuilder = &LineStringBuilder{}
-	parser.renderExtends(st, "TestClass", extendsBuilder)
+	parser.renderCompositions(st, "TestClass", extendsBuilder)
 	expectedResult = "\"" + builtinPackageName + ".int\" *-- \"main.TestClass\"\n"
 	if extendsBuilder.String() != expectedResult {
 		t.Errorf("TestRenderCompositions: Expected %s got %s", expectedResult, extendsBuilder.String())
@@ -977,7 +977,7 @@ namespace connectionlabels {
     class connectionlabels.AliasOfInt << (T, #FF7700) >>  {
     }
 }
-"connectionlabels.AliasOfInt" *-- "extends""connectionlabels.ImplementsAbstractInterface"
+"connectionlabels.AliasOfInt" *-- "composes""connectionlabels.ImplementsAbstractInterface"
 
 "connectionlabels.AbstractInterface" <|-- "implements""connectionlabels.ImplementsAbstractInterface"
 

@@ -51,7 +51,7 @@ func (st *Struct) AddToComposition(fType string) {
 	st.Extends[fType] = struct{}{}
 }
 
-//AddToExtends Adds an extends relationship to this struct. We want to make sure that *ExampleStruct
+//AddToExtends Adds an composes relationship to this struct. We want to make sure that *ExampleStruct
 //gets added as ExampleStruct so that we can properly build the relation later to the
 //class identifier
 func (st *Struct) AddToExtends(fType string) {

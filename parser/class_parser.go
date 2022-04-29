@@ -38,7 +38,7 @@ type LineStringBuilder struct {
 const tab = "    "
 const builtinPackageName = "__builtin__"
 const implements = `"实现"`
-const extends = `"泛化"`
+const composes = `"组合"`
 const aggregates = `"聚合"`
 const aliasOf = `"别名"`
 
@@ -524,7 +524,7 @@ func (p *ClassParser) renderStructure(structure *Struct, pack string, name strin
 	str.WriteLineWithDepth(1, fmt.Sprintf(`%s %s %s {`, renderStructureType, name, sType))
 	p.renderStructFields(structure, privateFields, publicFields)
 	p.renderStructMethods(structure, privateMethods, publicMethods)
-	p.renderExtends(structure, name, composition)
+	p.renderCompositions(structure, name, composition)
 	p.renderImplements(structure, name, extends)
 	p.renderAggregations(structure, name, aggregations)
 	if privateFields.Len() > 0 {
@@ -542,7 +542,7 @@ func (p *ClassParser) renderStructure(structure *Struct, pack string, name strin
 	str.WriteLineWithDepth(1, fmt.Sprintf(`}`))
 }
 
-func (p *ClassParser) renderExtends(structure *Struct, name string, composition *LineStringBuilder) {
+func (p *ClassParser) renderCompositions(structure *Struct, name string, composition *LineStringBuilder) {
 	orderedCompositions := []string{}
 
 	for c := range structure.Extends {
@@ -551,9 +551,9 @@ func (p *ClassParser) renderExtends(structure *Struct, name string, composition 
 		}
 		composedString := ""
 		if p.renderingOptions.ConnectionLabels {
-			composedString = extends
+			composedString = composes
 		}
-		c = fmt.Sprintf(`"%s" <|-- %s"%s.%s"`, c, composedString, structure.PackageName, name)
+		c = fmt.Sprintf(`"%s.%s" *-- %s"%s"`, structure.PackageName, name, composedString, c)
 		orderedCompositions = append(orderedCompositions, c)
 	}
 	sort.Strings(orderedCompositions)
